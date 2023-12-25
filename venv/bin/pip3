@@ -1,4 +1,4 @@
-#!/Users/kirillkabanov/Documents/GitHub/Cinema_bot/venv/bin/python3
+#!/home/dron/PycharmProjects/Cinema_bot/venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys
