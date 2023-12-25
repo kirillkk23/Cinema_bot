@@ -37,7 +37,7 @@ def create_answer(film: dict) -> str:
 
     inline_buttons = InlineKeyboardMarkup(row_width=1)
     ans = f'{film["name"]}\n'\
-          f'{film["shortDescription"]}' \
+          f'{film["about"]}' \
           f'{film["shortDescription"]}' \
           f'Смотреть фильм тут: inline_buttons.add(InlineKeyboardButton("Смотреть на КинопоискHD", kinopoisk_hd_url))'
 
@@ -55,9 +55,13 @@ async def get_film_kinopoisk(film_name: str):
             return film
 
 
-# loop = asyncio.get_event_loop()
-# response = loop.run_until_complete(make_request())
-# print(response)
+async def get_film_vokino(film_name: str):
+    url = f'http://api.vokino.tv/v2/list?name={film_name}'
+    async with aiohttp.request('GET', url) as response:
+        vokino_resp = await response.json()
+        film = vokino_resp["channels"][0]
+        if prepare_film_name(film['name'])== film_name or prepare_film_name(film['originalname']) == film_name:
+            return film
 
 
 
@@ -86,7 +90,7 @@ async def get_film(message: types.Message) -> None:
     if not film:
         await message.answer('Не нашли такой фильм.')
     else:
-        film = await get_film_kinopoisk(film)
+        film = await get_film_vokino(film)
         await message.answer(create_answer(film))
 
 
