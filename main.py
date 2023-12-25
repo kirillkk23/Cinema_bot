@@ -16,11 +16,18 @@ TOKEN = getenv("BOT_TOKEN")
 dp = Dispatcher()
 
 
+
+def search_stream_url(data):
+    if isinstance(data, dict) and 'channels' in data.keys():
+        return data['channels']
+    return [search_stream_url(el) for el in data if isinstance(el, dict) and  search_stream_url(el)]
+
+
 async def get_watch_link(film_id):
     url = f'http://api.vokino.tv/v2/online/filmix?id={film_id}&token=linux_820015859ecbfbe0ef29a6acc09aada6_905714'
     async with aiohttp.request('get', url) as resp:
         data = await resp.json()
-        return data['channels'][0]['stream_url']
+        return search_stream_url(data)[0]['stream_url']
 
 
 
