@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from typing import Any, Optional
 from aiohttp import ClientSession
 from aiogram import Bot, types
-from aiogram.dispatcher import Dispatcher, FSMContext
+from aiogram.dispatcher.dispatcher import Dispatcher#, FSMContext
 from aiogram.utils import executor
 from aiogram.dispatcher.filters import Text
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
