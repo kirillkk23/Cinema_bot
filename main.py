@@ -17,11 +17,11 @@ dp = Dispatcher()
 
 
 def create_answer(film: dict) -> str:
-    inline_buttons = InlineKeyboardMarkup(row_width=1)
-    ans = f'{film["name"]}\n' \
-          f'{film["about"]}' \
-          f'{film["shortDescription"]}' \
-          f'Смотреть фильм тут: inline_buttons.add(InlineKeyboardButton("Смотреть на КинопоискHD", kinopoisk_hd_url))'
+    link = f'http://api.vokino.tv/v2/view?id={film["details"]["id"]}&token=linux_820015859ecbfbe0ef29a6acc09aada6_905714'
+    ans = f'{film["details"]["name"]}\n' \
+          f'{film["details"]["about"]}\n' \
+          f'KP:{film["details"]["rating_kp"]} IMDB:{film["details"]["rating_imdb"]}'\
+          f'Смотреть фильм тут: {link}'
 
     return ans
 
@@ -38,11 +38,11 @@ async def get_film_kinopoisk(film_name: str):
 
 async def get_film_vokino(film_name: str):
     url = f'http://api.vokino.tv/v2/list?name={film_name}'
-    async with aiohttp.request('GET', url) as response:
+    async with (aiohttp.request('GET', url) as response):
         vokino_resp = await response.json()
         film = vokino_resp["channels"][0]
-        if prepare_film_name(film["details"]['name']) == film_name or prepare_film_name(
-                film["details"]['originalname']) == film_name:
+        if prepare_film_name(film["details"]['name']) == film_name or \
+            prepare_film_name(film["details"]['originalname']) == film_name:
             return film
 
 
