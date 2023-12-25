@@ -20,7 +20,7 @@ dp = Dispatcher()
 def search_stream_url(data):
     if isinstance(data, dict) and 'channels' in data.keys():
         return data['channels']
-    return [search_stream_url(el) for el in data if isinstance(el, dict) and  search_stream_url(el)]
+    return [search_stream_url(el) for el in data if isinstance(el, dict) and search_stream_url(el)]
 
 
 async def get_watch_link(film_id):
@@ -33,7 +33,10 @@ async def get_watch_link(film_id):
 
 
 async def create_answer(film: dict) -> str:
-    link = await get_watch_link(film["details"]["id"])
+    try:
+        link = await get_watch_link(film["details"]["id"])
+    except Exception:
+        link = 'huy'
 
     ans = f'{film["details"]["name"]}\n' \
           f'{film["details"]["about"]}\n' \
