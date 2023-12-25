@@ -16,8 +16,18 @@ TOKEN = getenv("BOT_TOKEN")
 dp = Dispatcher()
 
 
-def create_answer(film: dict) -> str:
-    link = f'http://api.vokino.tv/v2/view?id={film["details"]["id"]}&token=linux_820015859ecbfbe0ef29a6acc09aada6_905714'
+async def get_watch_link(film_id):
+    url = f'http://api.vokino.tv/v2/online/filmix?id={film_id}&token=linux_820015859ecbfbe0ef29a6acc09aada6_905714'
+    async with aiohttp.request('get', url) as resp:
+        data = await resp.json()
+        return data['channels'][0]['stream_url']
+
+
+
+
+async def create_answer(film: dict) -> str:
+    link = await get_watch_link(film["details"]["id"])
+
     ans = f'{film["details"]["name"]}\n' \
           f'{film["details"]["about"]}\n' \
           f'KP:{film["details"]["rating_kp"]} IMDB:{film["details"]["rating_imdb"]}'\
@@ -75,8 +85,8 @@ async def get_film(message: types.Message) -> None:
         film = await get_film_vokino(film)
         if not film:
             await message.answer('Не нашли такой фильм.')
-
-        await message.answer(create_answer(film))
+        answer_msg = await create_answer(film)
+        await message.answer(answer_msg)
 
 
 async def main() -> None:
