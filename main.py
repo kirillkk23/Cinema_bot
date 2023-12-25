@@ -6,41 +6,22 @@ from os import getenv
 import aiohttp
 from aiogram.types import InlineKeyboardMarkup
 
-from aiogram import Bot, Dispatcher, Router, types
+from aiogram import Bot, Dispatcher, types
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.types import Message
 from aiogram.utils.markdown import hbold
 
-# Bot token can be obtained via https://t.me/BotFather
-TOKEN = getenv("bot_token")
-API_TOKEN = getenv("api_token")
-# KINOPOISK_COOKIE = os.getenv("Kinopoisk_coockie")
-# USER_AGENT = os.getenv("User_agent")
-# import requests
-# headers = {"X-API-KEY": API_TOKEN}
-# resp = requests.get("https://api.kinopoisk.dev/v1.4/movie/34567", headers=headers)
-# print(resp.text)
-# All handlers should be attached to the Router (or Dispatcher)
+TOKEN = getenv("BOT_TOKEN")
 dp = Dispatcher()
-
-# def expand_film(raw_data):
-#     film_name = raw_data[0]['name']
-#     film_desc = response.json()[0]['description']
-#     film_short_desc = response.json()[0]['shortDescription']
-#     rating_kp = response.json()[0]['rating']['kp']
-#     rating_imdb = response.json()[0]['rating']['imdb']
-#     url_poster = response.json()[0]['poster']['url']
 
 
 def create_answer(film: dict) -> str:
-
     inline_buttons = InlineKeyboardMarkup(row_width=1)
-    ans = f'{film["name"]}\n'\
+    ans = f'{film["name"]}\n' \
           f'{film["about"]}' \
           f'{film["shortDescription"]}' \
           f'Смотреть фильм тут: inline_buttons.add(InlineKeyboardButton("Смотреть на КинопоискHD", kinopoisk_hd_url))'
-
 
     return ans
 
@@ -51,7 +32,7 @@ async def get_film_kinopoisk(film_name: str):
     async with aiohttp.request('GET', url, headers=headers) as response:
         kp_resp = await response.json()
         film = kp_resp["docs"][0]
-        if prepare_film_name(film['name'])== film_name or prepare_film_name(film['alternativeName']) == film_name:
+        if prepare_film_name(film['name']) == film_name or prepare_film_name(film['alternativeName']) == film_name:
             return film
 
 
@@ -60,9 +41,9 @@ async def get_film_vokino(film_name: str):
     async with aiohttp.request('GET', url) as response:
         vokino_resp = await response.json()
         film = vokino_resp["channels"][0]
-        if prepare_film_name(film['name'])== film_name or prepare_film_name(film['originalname']) == film_name:
+        if prepare_film_name(film["details"]['name']) == film_name or prepare_film_name(
+                film["details"]['originalname']) == film_name:
             return film
-
 
 
 @dp.message(CommandStart())
@@ -73,6 +54,7 @@ async def command_start_handler(message: Message) -> None:
     await message.answer(f'{hbold(message.from_user.full_name)}, Привет! '
                          'Я бот, который выдает ссылки на просмотр фильмов.'
                          'Какой фильм ты хочешь посмотреть?')
+
 
 def prepare_film_name(name):
     return re.sub(r'[^\w\s]', '', name.lower()).replace('ё', 'е')
@@ -85,18 +67,16 @@ async def get_film(message: types.Message) -> None:
 
     By default, message handler will handle all message types (like a text, photo, sticker etc.)
     """
-    #try:
+    # try:
     film = prepare_film_name(message.text)
     if not film:
         await message.answer('Не нашли такой фильм.')
     else:
         film = await get_film_vokino(film)
+        if not film:
+            await message.answer('Не нашли такой фильм.')
+
         await message.answer(create_answer(film))
-
-
-    # except TypeError:
-    #     # But not all the types is supported to be copied so need to handle it
-    #     await message.answer("Nice try!")
 
 
 async def main() -> None:
