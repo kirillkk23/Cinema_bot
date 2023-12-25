@@ -39,9 +39,9 @@ async def get_film_kinopoisk(film_name: str):
         raw_film_data = kp_resp["docs"][0]
         return expand_film(raw_film_data)
 
-loop = asyncio.get_event_loop()
-response = loop.run_until_complete(make_request())
-print(response)
+# loop = asyncio.get_event_loop()
+# response = loop.run_until_complete(make_request())
+# print(response)
 
 
 
@@ -68,8 +68,7 @@ async def get_film(message: types.Message) -> None:
     if not text:
         await message.answer('Иди нахуй, долбоёб!!!')
     else:
-
-    await message.send_copy(chat_id=message.chat.id)
+        await message.send_copy(chat_id=message.chat.id)
     # except TypeError:
     #     # But not all the types is supported to be copied so need to handle it
     #     await message.answer("Nice try!")
